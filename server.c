@@ -12,7 +12,6 @@
 
 #include "ft_printf.h"
 #include <signal.h>
-#include <signal.h>
 #include <unistd.h>
 #include <string.h>
 
@@ -39,7 +38,7 @@ static void handle_msg(int sig, siginfo_t *info, void *context)
         c = 0;
     }
 	if (kill(info->si_pid, SIGUSR1) == -1)
-        return;
+	return;
 }
 
 int main(void)
