@@ -30,7 +30,7 @@ void send_char(int pid, char c)
     i = 0;
     while (i < 8)
     {
-		g_received = 0;
+	g_received = 0;
         if ((c >> (7 - i)) & 1)
             kill(pid, SIGUSR1);
         else
