@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   client.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hfandres <hfandres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hfandres <hfandres@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/14 14:43:43 by hfandres          #+#    #+#             */
-/*   Updated: 2025/07/16 13:08:18 by hfandres         ###   ########.fr       */
+/*   Updated: 2025/07/25 13:53:14 by hfandres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,59 +15,56 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-void	send_strlen(int pid, int len)
-{
-	int	i;
+static int g_received = 0;
 
-	i = 0;
-	while (i < 32)
-	{
-		if ((len >> (31 - i)) & 1)
-			kill(pid, SIGUSR1);
-		else
-			kill(pid, SIGUSR2);
-		usleep(100);
-		i++;
-	}
+void handle_sig(int sig)
+{
+    if (sig == SIGUSR1)
+        g_received = 1;
 }
 
-void	send_char(int pid, char c)
+void send_char(int pid, char c)
 {
-	int	i;
+    int i;
 
-	i = 0;
-	while (i < 8)
-	{
-		if ((c >> (7 - i)) & 1)
-			kill(pid, SIGUSR1);
-		else
-			kill(pid, SIGUSR2);
-		usleep(100);
+    i = 0;
+    while (i < 8)
+    {
+		g_received = 0;
+        if ((c >> (7 - i)) & 1)
+            kill(pid, SIGUSR1);
+        else
+            kill(pid, SIGUSR2);
+        while (!g_received)
+            pause();
 		i++;
-	}
+    }
 }
 
-int	main(int ac, char **av)
+int main(int ac, char **av)
 {
-	char	*str;
-	int		len;
+    char *str;
+    int server_pid;
 
-	if (ac < 2 || ac > 4)
-	{
-		ft_printf("USAGE : %s <SERVER_PID> <string>\n", av[0]);
-		return (0);
-	}
-	else
-	{
-		str = av[2];
-		len = ft_strlen(str);
-		send_strlen(atoi(av[1]), len);
-		while (*str)
-		{
-			send_char(atoi(av[1]), *str);
-			str++;
-		}
-		send_char (atoi(av[1]), '\0');
-	}
-	return (0);
+    if (ac != 3)
+    {
+        ft_printf("USAGE : %s <SERVER_PID> <string>\n", av[0]);
+        return (1);
+    }
+    server_pid = atoi(av[1]);
+    if (server_pid <= 0)
+    {
+        ft_printf("Error: Invalid PID\n");
+        return (1);
+    }
+    str = av[2];
+    signal(SIGUSR1, handle_sig);
+    signal(SIGUSR2, handle_sig);
+    while (*str)
+    {
+        send_char(server_pid, *str);
+        str++;
+    }
+    send_char(server_pid, '\0');
+    return (0);
 }

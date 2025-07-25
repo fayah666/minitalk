@@ -1,67 +1,60 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   server.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hfandres <hfandres@student.42antananari    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/14 14:23:18 by hfandres          #+#    #+#             */
+/*   Updated: 2025/07/25 13:52:36 by hfandres         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "ft_printf.h"
-#include <unistd.h>
 #include <signal.h>
+#include <signal.h>
+#include <unistd.h>
+#include <string.h>
 
-static int g_msg_len = 0;
-
-static int handle_len(int sig)
-{
-    static int bit = 0;
-    if (bit == 0)
-        g_msg_len = 0;
-    if (sig == SIGUSR1)
-        g_msg_len |= (1 << (31 - bit));
-    bit++;
-    if (bit == 32)
-    {
-        ft_printf("Message length: %d\n", g_msg_len);
-        bit = 0;
-        return (1);
-    }
-    return (0);
-}
-
-static void handle_msg(int sig)
+static void handle_msg(int sig, siginfo_t *info, void *context)
 {
     static int bit = 0;
     static char c = 0;
-    static char msg[1000] = {0}; // Assuming a max message length of 1000
+    static char msg[134000];
     static int i = 0;
 
-    
+    (void)context;
     if (sig == SIGUSR1)
         c |= (1 << (7 - bit));
     bit++;
     if (bit == 8)
     {
         msg[i++] = c;
-        if (c == '\0' || i == g_msg_len)
+        if (c == '\0')
         {
             ft_printf("%s\n", msg);
-            g_msg_len = 0;
             i = 0;
-            bit = 0;
-            c = 0;
         }
         bit = 0;
         c = 0;
     }
-}
-
-void handle_signal(int sig)
-{
-    static int receiving_len = 1;
-    if (receiving_len)
-        receiving_len = !handle_len(sig);
-    else
-        handle_msg(sig);
+	if (kill(info->si_pid, SIGUSR1) == -1)
+        return;
 }
 
 int main(void)
 {
+    struct sigaction act;
+
     ft_printf("PID : %d\n", getpid());
-    signal(SIGUSR1, handle_signal);
-    signal(SIGUSR2, handle_signal);
+    ft_memset(&act, 0, sizeof(act));
+    act.sa_sigaction = handle_msg;
+    sigemptyset(&act.sa_mask);
+    act.sa_flags = SA_SIGINFO;
+    if (sigaction(SIGUSR1, &act, NULL) == -1)
+        return (1);
+    if (sigaction(SIGUSR2, &act, NULL) == -1)
+        return (1);
     while (1)
         pause();
     return (0);
