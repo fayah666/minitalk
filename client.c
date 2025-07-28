@@ -6,13 +6,12 @@
 /*   By: hfandres <hfandres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/14 14:43:43 by hfandres          #+#    #+#             */
-/*   Updated: 2025/07/28 02:36:17 by hfandres         ###   ########.fr       */
+/*   Updated: 2025/07/28 02:41:19 by hfandres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 #include <signal.h>
-#include <stdlib.h>
 #include <unistd.h>
 
 static int	g_received = 0;

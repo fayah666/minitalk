@@ -23,10 +23,15 @@ $(SERVER): $(SERVER_OBJ) $(LFTPRINTF)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(LFTPRINTF):
+	make -C ft_printf
+
 clean:
+	make clean -C ft_printf
 	$(RM) *.o
 
 fclean: clean
+	make fclean -C ft_printf
 	$(RM) $(CLIENT) $(SERVER)
 
 re: fclean all

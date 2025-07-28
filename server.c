@@ -6,15 +6,13 @@
 /*   By: hfandres <hfandres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/14 14:23:18 by hfandres          #+#    #+#             */
-/*   Updated: 2025/07/28 02:36:27 by hfandres         ###   ########.fr       */
+/*   Updated: 2025/07/28 02:48:02 by hfandres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 #include <signal.h>
-#include <signal.h>
 #include <unistd.h>
-#include <string.h>
 
 static void	handle_msg(int sig, siginfo_t *info, void *context)
 {
@@ -59,4 +57,3 @@ int	main(void)
 		pause();
 	return (0);
 }
-
