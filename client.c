@@ -6,7 +6,11 @@
 /*   By: hfandres <hfandres@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/14 14:43:43 by hfandres          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2025/07/25 13:53:14 by hfandres         ###   ########.fr       */
+=======
+/*   Updated: 2025/07/28 01:46:32 by hfandres         ###   ########.fr       */
+>>>>>>> 6d368d9 (norminette server.c)
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,4 +71,8 @@ int main(int ac, char **av)
     }
     send_char(server_pid, '\0');
     return (0);
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 6d368d9 (norminette server.c)
