@@ -6,7 +6,7 @@
 /*   By: hfandres <hfandres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 02:54:12 by hfandres          #+#    #+#             */
-/*   Updated: 2025/07/28 03:05:44 by hfandres         ###   ########.fr       */
+/*   Updated: 2025/07/28 03:14:02 by hfandres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,15 @@ void	send_char(int pid, char c)
 	{
 		g_received = 0;
 		if ((c >> (7 - i)) & 1)
-			kill(pid, SIGUSR1);
+		{
+			if (kill(pid, SIGUSR1) == -1)
+				return ;
+		}
 		else
-			kill(pid, SIGUSR2);
+		{
+			if (kill(pid, SIGUSR2) == -1)
+				return ;
+		}
 		while (!g_received)
 			pause();
 		i++;
