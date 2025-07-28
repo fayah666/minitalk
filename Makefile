@@ -9,8 +9,14 @@ SERVER  = server
 CLIENT_SRC = client.c
 SERVER_SRC = server.c
 
+CLIENT_BONUS_SRC = client_bonus.c
+SERVER_BONUS_SRC = server_bonus.c
+
 CLIENT_OBJ = $(CLIENT_SRC:.c=.o)
 SERVER_OBJ = $(SERVER_SRC:.c=.o)
+
+CLIENT_BONUS_OBJ = $(CLIENT_BONUS_SRC:.c=.o)
+SERVER_BONUS_OBJ = $(SERVER_BONUS_SRC:.c=.o)
 
 all: $(CLIENT) $(SERVER)
 
@@ -19,6 +25,10 @@ $(CLIENT): $(CLIENT_OBJ) $(LFTPRINTF)
 
 $(SERVER): $(SERVER_OBJ) $(LFTPRINTF)
 	$(CC) $(CFLAGS) $(SERVER_OBJ) $(LFTPRINTF) -o $(SERVER)
+
+bonus : $(CLIENT_BONUS_OBJ) $(SERVER_BONUS_OBJ) $(LFTPRINTF)
+		$(CC) $(CFLAGS) $(CLIENT_BONUS_OBJ) $(LFTPRINTF) -o $(CLIENT)
+		$(CC) $(CFLAGS) $(SERVER_BONUS_OBJ) $(LFTPRINTF) -o $(SERVER)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
