@@ -46,3 +46,43 @@ fclean: clean
 	$(RM) $(CLIENT) $(SERVER)
 
 re: fclean all
+
+test: all
+	@echo "\n=== Starting Server ==="
+	@./server & echo "Server PID: $$!"
+	@sleep 1
+	@echo "\n=== Testing Client ==="
+	@./client `pgrep server` "Hello World!"
+	@echo "\n=== Cleaning Up ==="
+	@pkill server
+	@make fclean
+	@echo "Test completed!\n"
+
+valgrind: all
+	@echo "\n=== Testing Server with Valgrind ==="
+	@valgrind --leak-check=full \
+		--show-leak-kinds=all \
+		--track-origins=yes \
+		--verbose \
+		--log-file=valgrind_server.log \
+		./server & \
+	SERVER_PID=$$! && \
+	sleep 1 && \
+	echo "\n=== Testing Client with Valgrind ===" && \
+	valgrind --leak-check=full \
+		--show-leak-kinds=all \
+		--track-origins=yes \
+		--verbose \
+		--log-file=valgrind_client.log \
+		./client $$SERVER_PID "Test Message" && \
+	sleep 1 && \
+	kill $$SERVER_PID && \
+	echo "\n=== Valgrind Logs Created ==="
+	@make fclean
+	@echo "Check valgrind_server.log and valgrind_client.log for results"
+
+clean_valgrind:
+	@echo "Cleaning Valgrind logs..."
+	$(RM) valgrind_server.log valgrind_client.log
+
+.PHONY: all bonus clean fclean re test valgrind

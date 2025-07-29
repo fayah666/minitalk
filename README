@@ -63,6 +63,60 @@ PID : xxxxx
 ./client [PID_SERVER] "Votre message"
 ```
 
+### Compilation et règles du Makefile
+
+```bash
+# Compilation complète (client et serveur)
+make
+
+# Compilation des versions bonus
+make bonus
+
+# Nettoyer les fichiers objets
+make clean
+
+# Nettoyer tous les fichiers générés (objets et exécutables)
+make fclean
+
+# Recompiler tout le projet
+make re
+
+# Lancer les tests automatiques
+make test
+
+# Vérifier les fuites mémoire avec Valgrind
+make valgrind
+```
+
+### Tests automatiques
+La règle `make test` va :
+- Compiler le projet
+- Lancer le serveur en arrière-plan
+- Envoyer un message de test
+- Nettoyer les processus
+
+### Analyse mémoire
+La règle `make valgrind` permet de :
+- Lancer le serveur sous Valgrind
+- Tester le client sous Valgrind
+- Générer des logs détaillés dans :
+  - `valgrind_server.log`
+  - `valgrind_client.log`
+
+### Utilisation basique
+
+```bash
+# Lancer le serveur
+./server
+# Le serveur affiche son PID
+PID : xxxxx
+
+# Dans un autre terminal, envoyer un message
+./client [PID_SERVER] "Votre message"
+```
+
+// ...existing code...
+
 ## 📁 Structure du projet
 
 ```
