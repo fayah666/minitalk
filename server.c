@@ -6,7 +6,7 @@
 /*   By: hfandres <hfandres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/14 14:23:18 by hfandres          #+#    #+#             */
-/*   Updated: 2025/07/29 11:08:19 by hfandres         ###   ########.fr       */
+/*   Updated: 2025/07/29 12:14:26 by hfandres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,14 @@ static void print_msg(t_list *msg)
 	}
 }
 
+static void init_action(struct sigaction *act)
+{
+	ft_memset(act, 0, sizeof(*act));
+	act->sa_sigaction = handle_msg;
+	sigemptyset(&act->sa_mask);
+	act->sa_flags = SA_SIGINFO;
+}
+
 static void	handle_msg(int sig, siginfo_t *info, void *context)
 {
 	static int		bit = 0;
@@ -102,10 +110,7 @@ int	main(void)
 	struct sigaction	act;
 
 	ft_printf("PID : %d\n", getpid());
-	ft_memset(&act, 0, sizeof(act));
-	act.sa_sigaction = handle_msg;
-	sigemptyset(&act.sa_mask);
-	act.sa_flags = SA_SIGINFO;
+	init_action(&act);
 	if (sigaction(SIGUSR1, &act, NULL) == -1)
 		return (1);
 	if (sigaction(SIGUSR2, &act, NULL) == -1)
