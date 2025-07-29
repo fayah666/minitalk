@@ -7,10 +7,10 @@ CLIENT  = client
 SERVER  = server
 
 CLIENT_SRC = client.c
-SERVER_SRC = server.c
+SERVER_SRC = server.c list/list.c
 
 CLIENT_BONUS_SRC = client_bonus.c
-SERVER_BONUS_SRC = server_bonus.c
+SERVER_BONUS_SRC = server_bonus.c list/list.c
 
 CLIENT_OBJ = $(CLIENT_SRC:.c=.o)
 SERVER_OBJ = $(SERVER_SRC:.c=.o)

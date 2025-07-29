@@ -6,38 +6,53 @@
 /*   By: hfandres <hfandres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/14 14:23:18 by hfandres          #+#    #+#             */
-/*   Updated: 2025/07/28 02:48:02 by hfandres         ###   ########.fr       */
+/*   Updated: 2025/07/29 10:40:41 by hfandres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#define _POSIX_C_SOURCE 199309L
 #include "ft_printf.h"
-#include <signal.h>
 #include <unistd.h>
+#include <signal.h>
+#include "list/list.h"
+
+static void	init_list(t_list **msg)
+{
+	if (!*msg)
+	{
+		*msg = list_init();
+		if (!*msg)
+			return ;
+	}
+}
 
 static void	handle_msg(int sig, siginfo_t *info, void *context)
 {
-	static int	bit = 0;
-	static char	c = 0;
-	static char	msg[134000];
-	static int	i = 0;
+	static int		bit = 0;
+	static char		c = 0;
+	static t_list	*msg = NULL;
 
 	(void)context;
+	init_list(&msg);
+	if (!msg)
+		return ;
 	if (sig == SIGUSR1)
 		c |= (1 << (7 - bit));
-	bit++;
-	if (bit == 8)
+	if (++bit == 8)
 	{
-		msg[i++] = c;
+		push_back(msg, c);
 		if (c == '\0')
 		{
-			ft_printf("%s\n", msg);
-			i = 0;
+			list_print(msg);
+			list_free(msg);
+			free(msg);
+			msg = NULL;
+			kill(info->si_pid, SIGUSR2);
 		}
 		bit = 0;
 		c = 0;
 	}
-	if (kill(info->si_pid, SIGUSR1) == -1)
-		return ;
+	kill(info->si_pid, SIGUSR1);
 }
 
 int	main(void)

@@ -6,7 +6,7 @@
 /*   By: hfandres <hfandres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/14 14:43:43 by hfandres          #+#    #+#             */
-/*   Updated: 2025/07/28 03:24:38 by hfandres         ###   ########.fr       */
+/*   Updated: 2025/07/29 10:08:51 by hfandres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,11 @@ void	handle_sig(int sig)
 {
 	if (sig == SIGUSR1)
 		g_received = 1;
+	if (sig == SIGUSR2)
+	{
+		ft_printf("Message received by server.\n");
+		g_received = 1;
+	}
 }
 
 void	send_char(int pid, char c)
@@ -64,6 +69,7 @@ int	main(int ac, char **av)
 	}
 	str = av[2];
 	signal(SIGUSR1, handle_sig);
+	signal(SIGUSR2, handle_sig);
 	while (*str)
 	{
 		send_char(server_pid, *str);
