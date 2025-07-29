@@ -6,9 +6,41 @@
 /*   By: hfandres <hfandres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/14 14:23:18 by hfandres          #+#    #+#             */
-/*   Updated: 2025/07/29 10:40:41 by hfandres         ###   ########.fr       */
+/*   Updated: 2025/07/29 11:08:19 by hfandres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+/**
+ * @file server.c
+ * @brief Server component of a simple client-server communication system using UNIX signals
+ *
+ * This program implements a server that receives messages from clients using UNIX signals
+ * (SIGUSR1 and SIGUSR2). It reconstructs characters bit by bit from the received signals
+ * and stores them in a linked list until a complete message is received.
+ *
+ * @functions
+ * static void init_list(t_list **msg)
+ *     Initializes a new linked list if the provided list pointer is NULL
+ *
+ * static void print_msg(t_list *msg)
+ *     Prints and frees the stored message if the list is not empty
+ *
+ * static void handle_msg(int sig, siginfo_t *info, void *context)
+ *     Signal handler that processes incoming SIGUSR1 and SIGUSR2 signals
+ *     Reconstructs characters bit by bit and stores them in a linked list
+ *     Sends acknowledgment signals back to the client
+ *
+ * int main(void)
+ *     Sets up signal handlers and enters an infinite loop waiting for signals
+ *     Displays the server's PID on startup
+ *
+ * @signals
+ * - SIGUSR1: Represents a '1' bit
+ * - SIGUSR2: Represents a '0' bit
+ *
+ * @note The server acknowledges each received bit with SIGUSR1
+ * @note When a complete message is received (null terminator), the server sends SIGUSR2
+ */
 
 #define _POSIX_C_SOURCE 199309L
 #include "ft_printf.h"
@@ -23,6 +55,16 @@ static void	init_list(t_list **msg)
 		*msg = list_init();
 		if (!*msg)
 			return ;
+	}
+}
+
+static void print_msg(t_list *msg)
+{
+	if (msg && !list_is_empty(msg))
+	{
+		list_print(msg);
+		list_free(msg);
+		free(msg);
 	}
 }
 
@@ -43,16 +85,16 @@ static void	handle_msg(int sig, siginfo_t *info, void *context)
 		push_back(msg, c);
 		if (c == '\0')
 		{
-			list_print(msg);
-			list_free(msg);
-			free(msg);
+			print_msg(msg);
 			msg = NULL;
-			kill(info->si_pid, SIGUSR2);
+			if (kill(info->si_pid, SIGUSR2) == -1)
+				return ;
 		}
 		bit = 0;
 		c = 0;
 	}
-	kill(info->si_pid, SIGUSR1);
+	if (kill(info->si_pid, SIGUSR1) == -1)
+		return ;
 }
 
 int	main(void)

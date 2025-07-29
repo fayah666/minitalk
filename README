@@ -1,0 +1,115 @@
+# Minitalk
+
+<div align="center">
+  <img src="https://img.shields.io/badge/Language-C-blue" alt="Language">
+  <img src="https://img.shields.io/badge/School-42-black" alt="42">
+  <img src="https://img.shields.io/badge/Norminette-passing-success" alt="Norminette">
+</div>
+
+## 📖 Description
+
+**Minitalk** est un projet de communication client-serveur utilisant les signaux UNIX. Le système utilise une liste chaînée pour stocker les messages et implémente un mécanisme d'accusé de réception bit par bit.
+
+## 🏗️ Architecture
+
+### 📡 Serveur (`server.c`)
+- Affiche son PID au démarrage
+- Utilise une liste chaînée pour stocker les messages
+- Reconstruit les caractères bit par bit
+- Envoie un SIGUSR1 pour confirmer chaque bit reçu
+- Envoie un SIGUSR2 quand le message complet est reçu
+
+### 📱 Client (`client.c`)
+- Prend en paramètres le PID du serveur et le message à envoyer
+- Envoie les caractères bit par bit
+- Attend l'accusé de réception pour chaque bit
+- Utilise une variable globale `g_received` pour la synchronisation
+
+## 🔧 Protocole de communication
+
+| Signal | Représentation | Usage |
+|--------|----------------|-------|
+| `SIGUSR1` | Bit `1` | Transmission de données + Accusé de réception |
+| `SIGUSR2` | Bit `0` | Transmission de données + Fin de message |
+
+### Structure des données
+```c
+typedef struct s_node
+{
+    char            data;
+    struct s_node   *next;
+}   t_node;
+
+typedef struct s_list
+{
+    t_node  *head;
+    t_node  *tail;
+    void    *data;
+}   t_list;
+```
+
+## 🚀 Installation et utilisation
+
+```bash
+# Compiler
+make
+
+# Lancer le serveur
+./server
+# Le serveur affiche son PID
+PID : xxxxx
+
+# Dans un autre terminal, envoyer un message
+./client [PID_SERVER] "Votre message"
+```
+
+## 📁 Structure du projet
+
+```
+minitalk/
+├── server.c
+├── client.c
+├── list/
+│   ├── list.c
+│   └── list.h
+└── ft_printf
+```
+
+## 🔍 Fonctionnalités
+
+### ✅ Implémentées
+- Communication via SIGUSR1 et SIGUSR2
+- Affichage du PID serveur
+- Accusé de réception bit par bit
+- Gestion des messages via liste chaînée
+- Une seule variable globale (g_received)
+
+### 🛠️ Gestion des erreurs
+- Vérification du PID serveur
+- Validation des arguments
+- Gestion des erreurs de kill()
+- Protection contre les erreurs d'allocation mémoire
+
+## 📋 Usage
+
+```bash
+# Démarrer le serveur
+./server
+PID : 12345
+
+# Envoyer un message
+./client 12345 "Hello World"
+
+# Le serveur affiche :
+Hello World
+```
+
+## 👨‍💻 Auteur
+
+Développé par hfandres dans le cadre du cursus de l'école 42.
+
+---
+
+<div align="center">
+  <i>Made with ❤️ at 42 School</i>
+</div>

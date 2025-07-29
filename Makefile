@@ -38,7 +38,8 @@ $(LFTPRINTF):
 
 clean:
 	make clean -C ft_printf
-	$(RM) *.o
+	$(RM) $(CLIENT_OBJ) $(SERVER_OBJ)
+	$(RM) $(CLIENT_BONUS_OBJ) $(SERVER_BONUS_OBJ)
 
 fclean: clean
 	make fclean -C ft_printf

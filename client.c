@@ -6,9 +6,36 @@
 /*   By: hfandres <hfandres@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/14 14:43:43 by hfandres          #+#    #+#             */
-/*   Updated: 2025/07/29 10:08:51 by hfandres         ###   ########.fr       */
+/*   Updated: 2025/07/29 11:08:59 by hfandres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+/**
+ * @file client.c
+ * @brief Client program for sending messages to a server using UNIX signals
+ *
+ * This program implements a client that sends messages to a server character by
+ * character using UNIX signals (SIGUSR1 and SIGUSR2). Each character is sent
+ * bit by bit, with SIGUSR1 representing 1 and SIGUSR2 representing 0.
+ *
+ * Global variables:
+ * @var g_received - Flag to track signal acknowledgment from server
+ *
+ * Functions:
+ * @fn handle_sig - Signal handler for receiving server acknowledgments
+ * @param sig Signal number received (SIGUSR1 or SIGUSR2)
+ *
+ * @fn send_char - Sends a single character to the server bit by bit
+ * @param pid Process ID of the server
+ * @param c Character to be sent
+ *
+ * @fn main - Entry point of the program
+ * @param ac Argument count
+ * @param av Argument vector (expects server PID and message string)
+ * @return 0 on success, 1 on error
+ *
+ * Usage: ./client <SERVER_PID> <STRING_TO_PASS>
+ */
 
 #include "ft_printf.h"
 #include <signal.h>
