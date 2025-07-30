@@ -3,47 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   server.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hfandres <hfandres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hfandres <hfandres@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/14 14:23:18 by hfandres          #+#    #+#             */
-/*   Updated: 2025/07/29 12:17:36 by hfandres         ###   ########.fr       */
+/*   Updated: 2025/07/30 12:48:48 by hfandres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-/**
- * @file server.c
- * @brief Server component of a simple client-server communication system using UNIX signals
- *
- * This program implements a server that receives messages from clients using UNIX signals
- * (SIGUSR1 and SIGUSR2). It reconstructs characters bit by bit from the received signals
- * and stores them in a linked list until a complete message is received.
- *
- * @functions
- * static void init_list(t_list **msg)
- *     Initializes a new linked list if the provided list pointer is NULL
- *
- * static void print_msg(t_list *msg)
- *     Prints and frees the stored message if the list is not empty
- *
- * static void handle_msg(int sig, siginfo_t *info, void *context)
- *     Signal handler that processes incoming SIGUSR1 and SIGUSR2 signals
- *     Reconstructs characters bit by bit and stores them in a linked list
- *     Sends acknowledgment signals back to the client
- *
- * int main(void)
- *     Sets up signal handlers and enters an infinite loop waiting for signals
- *     Displays the server's PID on startup
- *
- * @signals
- * - SIGUSR1: Represents a '1' bit
- * - SIGUSR2: Represents a '0' bit
- *
- * @note The server acknowledges each received bit with SIGUSR1
- * @note When a complete message is received (null terminator), the server sends SIGUSR2
- */
-
 #define _POSIX_C_SOURCE 199309L
-#include "ft_printf.h"
+#include "ft_printf/includes/ft_printf.h"
 #include <unistd.h>
 #include <signal.h>
 #include "list/list.h"
@@ -58,7 +26,7 @@ static void	init_list(t_list **msg)
 	}
 }
 
-static void print_msg(t_list *msg)
+static void	print_msg(t_list *msg)
 {
 	if (msg && !list_is_empty(msg))
 	{
@@ -75,9 +43,8 @@ static void	handle_msg(int sig, siginfo_t *info, void *context)
 	static t_list	*msg = NULL;
 
 	(void)context;
-	init_list(&msg);
 	if (!msg)
-		return ;
+		init_list(&msg);
 	if (sig == SIGUSR1)
 		c |= (1 << (7 - bit));
 	if (++bit == 8)
@@ -97,7 +64,7 @@ static void	handle_msg(int sig, siginfo_t *info, void *context)
 		return ;
 }
 
-static void init_action(struct sigaction *act)
+static void	init_action(struct sigaction *act)
 {
 	ft_memset(act, 0, sizeof(*act));
 	act->sa_sigaction = handle_msg;
@@ -105,10 +72,16 @@ static void init_action(struct sigaction *act)
 	act->sa_flags = SA_SIGINFO;
 }
 
-int	main(void)
+int	main(int ac, char **av)
 {
 	struct sigaction	act;
 
+	(void) av;
+	if (ac != 1)
+	{
+		ft_printf("Usage: ./server\n");
+		return (1);
+	}
 	ft_printf("PID : %d\n", getpid());
 	init_action(&act);
 	if (sigaction(SIGUSR1, &act, NULL) == -1)

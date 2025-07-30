@@ -3,41 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   client.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hfandres <hfandres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hfandres <hfandres@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/14 14:43:43 by hfandres          #+#    #+#             */
-/*   Updated: 2025/07/29 11:08:59 by hfandres         ###   ########.fr       */
+/*   Updated: 2025/07/30 14:06:19 by hfandres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-/**
- * @file client.c
- * @brief Client program for sending messages to a server using UNIX signals
- *
- * This program implements a client that sends messages to a server character by
- * character using UNIX signals (SIGUSR1 and SIGUSR2). Each character is sent
- * bit by bit, with SIGUSR1 representing 1 and SIGUSR2 representing 0.
- *
- * Global variables:
- * @var g_received - Flag to track signal acknowledgment from server
- *
- * Functions:
- * @fn handle_sig - Signal handler for receiving server acknowledgments
- * @param sig Signal number received (SIGUSR1 or SIGUSR2)
- *
- * @fn send_char - Sends a single character to the server bit by bit
- * @param pid Process ID of the server
- * @param c Character to be sent
- *
- * @fn main - Entry point of the program
- * @param ac Argument count
- * @param av Argument vector (expects server PID and message string)
- * @return 0 on success, 1 on error
- *
- * Usage: ./client <SERVER_PID> <STRING_TO_PASS>
- */
-
-#include "ft_printf.h"
+#include "ft_printf/includes/ft_printf.h"
 #include <signal.h>
 #include <unistd.h>
 
@@ -50,11 +23,26 @@ void	handle_sig(int sig)
 	if (sig == SIGUSR2)
 	{
 		ft_printf("Message received by server.\n");
-		g_received = 1;
+		g_received = 2;
 	}
 }
 
-void	send_char(int pid, char c)
+int	wait_ack(void)
+{
+	int	tries;
+
+	tries = 0;
+	while (g_received == 0)
+	{
+		usleep(1000);
+		tries++;
+		if (tries > 100)
+			return (-1);
+	}
+	return (0);
+}
+
+int	send_char(int pid, char c)
 {
 	int	i;
 
@@ -65,17 +53,18 @@ void	send_char(int pid, char c)
 		if ((c >> (7 - i)) & 1)
 		{
 			if (kill(pid, SIGUSR1) == -1)
-				return ;
+				return (-1);
 		}
 		else
 		{
 			if (kill(pid, SIGUSR2) == -1)
-				return ;
+				return (-1);
 		}
-		while (!g_received)
-			pause();
+		if (wait_ack() == -1)
+			return (-1);
 		i++;
 	}
+	return (0);
 }
 
 int	main(int ac, char **av)
@@ -99,7 +88,8 @@ int	main(int ac, char **av)
 	signal(SIGUSR2, handle_sig);
 	while (*str)
 	{
-		send_char(server_pid, *str);
+		if (send_char(server_pid, *str) == -1)
+			return (ft_printf("Error: server doesn't respond\n"));
 		str++;
 	}
 	send_char(server_pid, '\0');

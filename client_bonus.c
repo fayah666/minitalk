@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   client_bonus.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hfandres <hfandres@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hfandres <hfandres@student.42antananari    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/28 02:54:12 by hfandres          #+#    #+#             */
-/*   Updated: 2025/07/28 03:24:54 by hfandres         ###   ########.fr       */
+/*   Created: 2025/07/14 14:43:43 by hfandres          #+#    #+#             */
+/*   Updated: 2025/07/30 14:07:29 by hfandres         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_printf.h"
+#include "ft_printf/includes/ft_printf.h"
 #include <signal.h>
 #include <unistd.h>
 
@@ -20,9 +20,29 @@ void	handle_sig(int sig)
 {
 	if (sig == SIGUSR1)
 		g_received = 1;
+	if (sig == SIGUSR2)
+	{
+		ft_printf("Message received by server.\n");
+		g_received = 2;
+	}
 }
 
-void	send_char(int pid, char c)
+int	wait_ack(void)
+{
+	int	tries;
+
+	tries = 0;
+	while (g_received == 0)
+	{
+		usleep(1000);
+		tries++;
+		if (tries > 100)
+			return (-1);
+	}
+	return (0);
+}
+
+int	send_char(int pid, char c)
 {
 	int	i;
 
@@ -33,17 +53,18 @@ void	send_char(int pid, char c)
 		if ((c >> (7 - i)) & 1)
 		{
 			if (kill(pid, SIGUSR1) == -1)
-				return ;
+				return (-1);
 		}
 		else
 		{
 			if (kill(pid, SIGUSR2) == -1)
-				return ;
+				return (-1);
 		}
-		while (!g_received)
-			pause();
+		if (wait_ack() == -1)
+			return (-1);
 		i++;
 	}
+	return (0);
 }
 
 int	main(int ac, char **av)
@@ -64,9 +85,11 @@ int	main(int ac, char **av)
 	}
 	str = av[2];
 	signal(SIGUSR1, handle_sig);
+	signal(SIGUSR2, handle_sig);
 	while (*str)
 	{
-		send_char(server_pid, *str);
+		if (send_char(server_pid, *str) == -1)
+			return (ft_printf("Error: server doesn't respond\n"));
 		str++;
 	}
 	send_char(server_pid, '\0');
