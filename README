@@ -1,11 +1,5 @@
 # Minitalk
 
-<div align="center">
-  <img src="https://img.shields.io/badge/Language-C-blue" alt="Language">
-  <img src="https://img.shields.io/badge/School-42-black" alt="42">
-  <img src="https://img.shields.io/badge/Norminette-passing-success" alt="Norminette">
-</div>
-
 ## 📖 Description
 
 **Minitalk** est un projet de communication client-serveur utilisant les signaux UNIX. Le système utilise une liste chaînée pour stocker les messages et implémente un mécanisme d'accusé de réception bit par bit.
@@ -163,7 +157,3 @@ Hello World
 Développé par hfandres dans le cadre du cursus de l'école 42.
 
 ---
-
-<div align="center">
-  <i>Made with ❤️ at 42 School</i>
-</div>
